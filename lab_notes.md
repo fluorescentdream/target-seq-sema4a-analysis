@@ -1,4 +1,4 @@
-TARGET-seq SEMA4A Analysis - Day 1
+##TARGET-seq SEMA4A Analysis - Day 1
 
 objective: load the published TARGET-seq dataset into R and perform an initial exploratory analysis of SEMA4A expression across cells.
 
@@ -27,3 +27,23 @@ next steps:
 - investigate genes whose expression correlates with SEMA4A.
 - begin statistical testing of observed expression differences.
 - potentially use ML to predict responses based on features. 
+
+##SEMA4A Correlation Expression Analysis
+
+objective: identify genes correlated with SEMA4A expression.
+
+tasks completed:
+- loaded TARGET-seq single-cell RNA-seq raw counts and metadata into R
+- extracted SEMA4A expression across all cells
+- assigned SEMA4A expression values to each cell in the metadata table
+- computed gene-wise correlation between SEMA4A and all ~36000 genes across 14073 cells
+
+observations:
+- many genes showed near-zero or undefined correlation with SEMA4A
+- some correlations were NA due to genes with zero variance (no expression across cells)
+- final output: a correlation value for every gene vs SEMA4A
+- biological inference: high positive correlation suggests co-expression across the same cell states
+
+next steps: 
+- identify top positively and negatively correlated genes
+- investigate whether correlated genes are enriched in specific pathways or cell types and look at biological interpretations
