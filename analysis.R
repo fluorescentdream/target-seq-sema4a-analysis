@@ -3,6 +3,23 @@ library(readr)
 library(ggplot2)
 library(tidyverse)
 
+save_plot <- function(plot, filename, width = 8, height = 6) {
+  ggsave(
+    paste0("figures/", filename, ".png"),
+    plot = plot,
+    width = width,
+    height = height,
+    dpi = 300
+  )
+  
+  ggsave(
+    paste0("figures/", filename, ".pdf"),
+    plot = plot,
+    width = width,
+    height = height
+  )
+}
+
 Sys.setenv("VROOM_CONNECTION_SIZE" = 10000000)
 TARGET_seq_raw_counts <- read_tsv("data/TARGET-seq_raw_counts_matrix.txt.gz")
 #View(TARGET_seq_raw_counts)
@@ -41,7 +58,7 @@ aggregate(SEMA4A ~ Sample_type, data = TARGET_seq_metadata, FUN = mean)
 boxplot(SEMA4A ~ Sample_type, data = TARGET_seq_metadata, las = 2, cex.axis = 0.7, main = "SEMA4A Expression by Sample Type")
 
 # top 20 SEMA4A-expressing cells
-top <- TARGET_seq_metadata[order(TARGET_seq_metadata$SEMA4A, decreasing = TRUE),]
+top <- TARGET_seq_metadata %>% arrange(desc(SEMA4A))
 head(top$Cell, 20)
 
 # tapply(values, groups, function). splits values into groups and applies a function
@@ -58,124 +75,74 @@ table(TARGET_seq_metadata$Genotype, TARGET_seq_metadata$Cluster)
 aggregate(SEMA4A ~ Cluster, data = subset(TARGET_seq_metadata, Genotype == "DNMT3A"), mean)
 
 # is sema4a expressed in most cells or only a subset ? most cells express it very little. 
-ggplot(TARGET_seq_metadata, aes(x = SEMA4A)) +
-  geom_histogram(bins = 50, fill = "steelblue", color = "black") +
-  scale_x_continuous(trans = "log1p") +
-  theme_bw() +
-  labs(
-    title = "Distribution of SEMA4A Expression",
-    x = "SEMA4A Expression",
-    y = "Number of Cells"
-  )
+figure1 <- ggplot(TARGET_seq_metadata, aes(x = SEMA4A)) +
+            geom_histogram(bins = 50, fill = "steelblue", color = "black") +
+            scale_x_continuous(trans = "log1p") +
+            theme_bw() +
+            labs(
+              title = "Distribution of SEMA4A Expression",
+              x = "SEMA4A Expression",
+              y = "Number of Cells"
+            )
 
-ggsave(
-  "figures/Figure1_SEMA4A_distribution.png",
-  width = 8,
-  height = 6
-)
+save_plot(figure1, "Figure1_SEMA4A_distribution")
 
-ggsave(
-  "figures/Figure1_SEMA4A_distribution.pdf",
-  width = 8,
-  height = 6,
-  dpi = 300
-)
 
 # highest expressing clusters on top because of fct_reorder
-ggplot(TARGET_seq_metadata, aes(x = fct_reorder(Cluster, SEMA4A, .fun = mean), y=SEMA4A)) + 
-  geom_violin(fill = "steelblue", color = "black", scale = "width") +
-  coord_flip() +
-  scale_y_continuous(trans = "log1p") +
-  theme_bw(base_size = 12, base_family = "serif") +
-  labs(
-    title = "SEMA4A Expression by Cell Cluster",
-    x = "Cell Cluster",
-    y = "SEMA4A Expression"
-  ) +
-  geom_boxplot(width = 0.1, outlier.size = 0.3)
+figure2 <- ggplot(TARGET_seq_metadata, aes(x = fct_reorder(Cluster, SEMA4A, .fun = mean), y=SEMA4A)) + 
+            geom_violin(fill = "steelblue", color = "black", scale = "width") +
+            coord_flip() +
+            scale_y_continuous(trans = "log1p") +
+            theme_bw(base_size = 12, base_family = "serif") +
+            labs(
+              title = "SEMA4A Expression by Cell Cluster",
+              x = "Cell Cluster",
+              y = "SEMA4A Expression"
+            ) +
+            geom_boxplot(width = 0.1, outlier.size = 0.3)
 
-ggsave(
-  "figures/Figure2_SEMA4A_by_cluster.png",
-  width = 8,
-  height = 6
-)
+save_plot(figure2, "Figure2_SEMA4A_by_cluster")
 
-ggsave(
-  "figures/Figure2_SEMA4A_by_cluster.pdf",
-  width = 8,
-  height = 6,
-  dpi = 300
-)
 
-ggplot(TARGET_seq_metadata, aes(x = fct_reorder(Genotype, SEMA4A, .fun = mean), y=SEMA4A)) + 
-  geom_boxplot(fill = "steelblue", color = "black") +
-  coord_flip() +
-  scale_y_continuous(trans = "log1p") +
-  theme_bw(base_size = 12, base_family = "serif") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(
-    title = "SEMA4A Expression by Genotype",
-    x = "Genotype",
-    y = "SEMA4A Expression"
-  )
+figure3 <- ggplot(TARGET_seq_metadata, aes(x = fct_reorder(Genotype, SEMA4A, .fun = mean), y=SEMA4A)) + 
+            geom_boxplot(fill = "steelblue", color = "black") +
+            coord_flip() +
+            scale_y_continuous(trans = "log1p") +
+            theme_bw(base_size = 12, base_family = "serif") +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+            labs(
+              title = "SEMA4A Expression by Genotype",
+              x = "Genotype",
+              y = "SEMA4A Expression"
+            )
 
-ggsave(
-  "figures/Figure3_SEMA4A_by_genotype.png",
-  width = 8,
-  height = 6
-)
+save_plot(figure3, "Figure3_SEMA4A_by_genotype")
 
-ggsave(
-  "figures/Figure3_SEMA4A_by_genotype.pdf",
-  width = 8,
-  height = 6,
-  dpi = 300
-)
 
-ggplot(TARGET_seq_metadata, aes(x = fct_reorder(Sample_type, SEMA4A, .fun = mean), y=SEMA4A)) + 
-  geom_violin(fill = "steelblue", color = "black", scale = "width") +
-  coord_flip() +
-  scale_y_continuous(trans = "log1p") +
-  theme_bw(base_size = 12, base_family = "serif") +
-  labs(
-    title = "SEMA4A Expression by Sample Type",
-    x = "Sample Type",
-    y = "Expression (log1p)"
-  ) 
+figure4 <- ggplot(TARGET_seq_metadata, aes(x = fct_reorder(Sample_type, SEMA4A, .fun = mean), y=SEMA4A)) + 
+            geom_violin(fill = "steelblue", color = "black", scale = "width") +
+            coord_flip() +
+            scale_y_continuous(trans = "log1p") +
+            theme_bw(base_size = 12, base_family = "serif") +
+            labs(
+              title = "SEMA4A Expression by Sample Type",
+              x = "Sample Type",
+              y = "Expression (log1p)"
+            ) 
 
-ggsave(
-  "figures/Figure4_SEMA4A_by_sample.png",
-  width = 8,
-  height = 6,
-)
+save_plot(figure4, "Figure4_SEMA4A_by_sample")
 
-ggsave(
-  "figures/Figure4_SEMA4A_by_sample.pdf",
-  width = 8,
-  height = 6,
-  dpi = 300
-)
 
 cluster_means <- aggregate(SEMA4A ~ Cluster, data = TARGET_seq_metadata, FUN = mean)
-ggplot(cluster_means, aes(x = fct_reorder(Cluster, SEMA4A), y=SEMA4A)) + 
-  geom_col(fill = "steelblue") +
-  coord_flip() +
-  theme_classic() +
-  labs(
-    title = "Mean SEMA4A Expression by Cell Cluster",
-    x = "Cell Cluster",
-    y = "Mean Expression"
-  )
+figure5 <- ggplot(cluster_means, aes(x = fct_reorder(Cluster, SEMA4A), y=SEMA4A)) + 
+            geom_col(fill = "steelblue") +
+            coord_flip() +
+            theme_classic() +
+            labs(
+              title = "Mean SEMA4A Expression by Cell Cluster",
+              x = "Cell Cluster",
+              y = "Mean Expression"
+            )
 
-ggsave(
-  "figures/Figure5_mean_SEMA4A_by_cluster.png",
-  width = 8,
-  height = 6,
-)
+save_plot(figure5, "Figure5_mean_SEMA4A_by_cluster")
 
-ggsave(
-  "figures/Figure5_mean_SEMA4A_by_cluster.pdf",
-  width = 8,
-  height = 6,
-  dpi = 300
-)
