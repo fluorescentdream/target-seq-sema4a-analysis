@@ -94,3 +94,25 @@ observations:
 - strongest positive correlations were observed in HSC/MPP, Small Pre-B, and Monocyte populations
 - several clusters produced NA correlations due to zero variance in gene expression
 
+## SEMA4A vs GCK Detection Analysis (HSC/MPP subset)
+objective: determine whether GCK detection status is associated with SEMA4A expression in HSC/MPP cells, following up on weak whole-population correlation (r = 0.384, computed earlier on continuous GCK vs SEMA4A across all HSC/MPP cells)
+
+tasks completed:
+- subset metadata to HSC/MPP cluster (n = 4951 cells: 4787 GCK-, 164 GCK+)
+- visualized raw GCK vs SEMA4A scatter; found heavy zero-inflation in both genes, typical of single-cell dropout, which obscured the scatter and any linear trend
+- re-expressed GCK as a binary detection variable (GCK_detected = GCK > 0) to sidestep the zero-inflation problem in the continuous scatter
+- split analysis into two parts to separately test detection vs magnitude effects:
+  - part 1: proportion of cells expressing SEMA4A (SEMA4A > 0), by GCK status
+  - part 2: among SEMA4A+ cells only, expression magnitude by GCK status
+  
+results:
+- part 1 (Fisher's exact test): 36.3% of GCK- cells vs 32.9% of GCK+ cells express SEMA4A. OR = 0.86, 95% CI [0.61, 1.21], p = 0.409. 
+  - NOT significant -- GCK detection does not predict whether a cell expresses SEMA4A at all.
+- part 2 (Wilcoxon rank-sum, SEMA4A+ cells only, n=164 GCK+ subset shrinks to 50-60 cells after filtering): GCK+ cells trend toward higher SEMA4A levels (median ~30 vs ~20) but W = 41627, p = 0.154. NOT significant, though notably lower than the p-value from testing on the full zero-inflated dataset (p=0.604)
+  - signal is concentrated among expressing cells but is underpowered given the small GCK+ subgroup.
+  
+observations:
+- GCK detection alone is not a significant predictor of SEMA4A expression, either presence/absence or magnitude, in HSC/MPP cells
+- the modest whole-population correlation (r=0.384) appears to be driven more by the small number of high-GCK, high-SEMA4A cells than by a population-level relationship; consistent with non-significant Fisher's and Wilcoxon results
+- small n in the GCK-detected group (164 of 4951 cells, ~3.3%) limits statistical power to detect a true effect if one exists
+- should be read as inconclusive rather than no relationship
