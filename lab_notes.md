@@ -116,3 +116,10 @@ observations:
 - the modest whole-population correlation (r=0.384) appears to be driven more by the small number of high-GCK, high-SEMA4A cells than by a population-level relationship; consistent with non-significant Fisher's and Wilcoxon results
 - small n in the GCK-detected group (164 of 4951 cells, ~3.3%) limits statistical power to detect a true effect if one exists
 - should be read as inconclusive rather than no relationship
+
+## Functional Enrichment (disaster so far...) - part 1
+- i ranked genes by how strongly their expression correlates with SEMA4A, then took the top 100 protein-coding genes and checked whether they share any common biological function (using GO enrichment analysis). 
+- of these, 45 genes had known functional annotations. after correcting for multiple testing, none of the biological categories tested reached statistical significance; meaning i can't confidently say this gene list points to one specific shared pathway. 
+- the closest (non-significant) hits were "cell fate determination" and "regulation of metal ion transport," but these are suggestive at best, not confirmed. 
+- this is likely due to the small number of annotated genes relative to the very large number of categories tested.
+- will try again with GSEA!
